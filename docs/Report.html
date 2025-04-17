@@ -1,0 +1,324 @@
+<html>
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=utf-8">
+<meta name=Generator content="Microsoft Word 15 (filtered)">
+<style>
+<!--
+ /* Font Definitions */
+ @font-face
+	{font-family:Wingdings;
+	panose-1:5 0 0 0 0 0 0 0 0 0;}
+@font-face
+	{font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;}
+@font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+@font-face
+	{font-family:Aptos;
+	panose-1:2 11 0 4 2 2 2 2 2 4;}
+ /* Style Definitions */
+ p.MsoNoSpacing, li.MsoNoSpacing, div.MsoNoSpacing
+	{margin:0in;
+	font-size:11.0pt;
+	font-family:"Calibri",sans-serif;}
+.MsoChpDefault
+	{font-family:"Calibri",sans-serif;}
+.MsoPapDefault
+	{margin-bottom:8.0pt;
+	line-height:107%;}
+@page WordSection1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.0in 1.0in 1.0in;}
+div.WordSection1
+	{page:WordSection1;}
+ /* List Definitions */
+ ol
+	{margin-bottom:0in;}
+ul
+	{margin-bottom:0in;}
+-->
+</style>
+
+</head>
+
+<body lang=EN-US style='word-wrap:break-word'>
+
+<div class=WordSection1>
+
+<p class=MsoNoSpacing align=center style='text-align:center;line-height:200%'><b><span
+lang=EN-CA style='font-size:20.0pt;line-height:200%;font-family:"Aptos",sans-serif'>Classifying
+Malaria Cells using Convolutional Neural Networks</span></b></p>
+
+<p class=MsoNoSpacing align=center style='text-align:center;line-height:200%'><b><span
+style='font-size:12.0pt;line-height:200%;font-family:"Aptos",sans-serif'>&nbsp;</span></b></p>
+
+<p class=MsoNoSpacing style='text-align:justify;text-indent:.5in;line-height:
+200%'><span lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:
+"Aptos",sans-serif'>In this research, we trained a model to classify photos of
+red blood cells as infected or uninfected to examine how deep learning can help
+automate malaria diagnosis. We used the &quot;Cell Images for Detecting
+Malaria&quot; Kaggle dataset, which has almost 27,000 photos. We built a CNN
+from the ground up and trained it to a validation accuracy of about 94.5%. We focused
+on making the model accurate and efficient because I only used a regular CPU
+(no GPU). To improve generality, I used a variety of data augmentation
+techniques. The results showed that picture classification jobs benefit
+significantly from using a well-tuned basic CNN. Additionally, I saw certain
+areas where the model may be improved.</span></p>
+
+<p class=MsoNoSpacing style='text-align:justify;text-indent:.5in;line-height:
+200%'><span lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:
+"Aptos",sans-serif'>&nbsp;</span></p>
+
+<p class=MsoNoSpacing style='text-align:justify;line-height:200%'><b><span
+style='font-size:14.0pt;line-height:200%;font-family:"Aptos",sans-serif'>Introduction</span></b></p>
+
+<p class=MsoNoSpacing style='text-align:justify;text-indent:.5in;line-height:
+200%'><span lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:
+"Aptos",sans-serif'>Malaria is still a significant issue in many parts of the
+world, and early, accurate diagnosis can save lives. Although manual diagnosis
+with microscopes is common, it can be laborious and error-prone. Therefore, my
+goal for this study was to determine if a CNN or another deep learning model
+could make this process more efficient. To preserve practicality and
+accessibility, the key goal was to develop a working model that can be trained
+without a GPU and performs well on a real dataset.</span></p>
+
+<p class=MsoNoSpacing style='text-align:justify;text-indent:.5in;line-height:
+200%'><span lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:
+"Aptos",sans-serif'>&nbsp;</span></p>
+
+<p class=MsoNoSpacing style='text-align:justify;text-indent:.5in;line-height:
+200%'><span lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:
+"Aptos",sans-serif'>&nbsp;</span></p>
+
+<p class=MsoNoSpacing style='text-align:justify;line-height:200%'><b><span
+style='font-size:14.0pt;line-height:200%;font-family:"Aptos",sans-serif'>Dataset</span></b></p>
+
+<p class=MsoNoSpacing style='text-align:justify;line-height:200%'><span
+lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:"Aptos",sans-serif'>I
+made use of the &quot;Cell Images for Detecting Malaria&quot; dataset on
+Kaggle, which has two different kinds of images: </span></p>
+
+<p class=MsoNoSpacing style='margin-left:.5in;text-indent:-.25in;line-height:
+200%'><span lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:
+Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-CA style='font-size:12.0pt;line-height:200%;
+font-family:"Aptos",sans-serif'>Parasitized: Red blood cells with an infection</span></p>
+
+<p class=MsoNoSpacing style='margin-left:.5in;text-indent:-.25in;line-height:
+200%'><span lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:
+Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-CA style='font-size:12.0pt;line-height:200%;
+font-family:"Aptos",sans-serif'>Uninfected: Normal Red blood cells </span></p>
+
+<p class=MsoNoSpacing style='text-align:justify;line-height:200%'><span
+lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:"Aptos",sans-serif'>I
+divided the dataset into 80% training and 20% validation sets and ensured it
+was adequately categorized into the appropriate folders. Although the quality
+of the dataset was decent, augmentation significantly improved it.</span></p>
+
+<p class=MsoNoSpacing style='text-align:justify;line-height:200%'><span
+lang=EN-CA style='font-size:14.0pt;line-height:200%;font-family:"Aptos",sans-serif'>&nbsp;</span></p>
+
+<p class=MsoNoSpacing style='text-align:justify;line-height:200%'><b><span
+style='font-size:14.0pt;line-height:200%;font-family:"Aptos",sans-serif'>Data
+Preprocessing &amp; Augmentation</span></b></p>
+
+<p class=MsoNoSpacing style='text-align:justify;line-height:200%'><span
+lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:"Aptos",sans-serif'>I
+preprocessed using TensorFlow's Image Data Generator to enhance the model's
+performance and lessen overfitting. This is what I used: </span></p>
+
+<p class=MsoNoSpacing style='margin-left:.5in;text-indent:-.25in;line-height:
+200%'><span lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:
+Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-CA style='font-size:12.0pt;line-height:200%;
+font-family:"Aptos",sans-serif'>The pixel values are rescaled to [0, 1]. </span></p>
+
+<p class=MsoNoSpacing style='margin-left:.5in;text-indent:-.25in;line-height:
+200%'><span lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:
+Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-CA style='font-size:12.0pt;line-height:200%;
+font-family:"Aptos",sans-serif'>Image resizing to the standard input size of
+128x128 </span></p>
+
+<p class=MsoNoSpacing style='margin-left:.5in;text-indent:-.25in;line-height:
+200%'><span lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:
+Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-CA style='font-size:12.0pt;line-height:200%;
+font-family:"Aptos",sans-serif'>Augmentation like:</span></p>
+
+<p class=MsoNoSpacing style='margin-left:1.0in;text-indent:-.25in;line-height:
+200%'><span lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:
+"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp; </span></span><span
+lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:"Aptos",sans-serif'>Random
+rotations (±20°) shift in width/height (0.2) </span></p>
+
+<p class=MsoNoSpacing style='margin-left:1.0in;text-indent:-.25in;line-height:
+200%'><span lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:
+"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp; </span></span><span
+lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:"Aptos",sans-serif'>Horizontal,
+shear, and zoom flips</span></p>
+
+<p class=MsoNoSpacing style='line-height:200%'><span lang=EN-CA
+style='font-size:12.0pt;line-height:200%;font-family:"Aptos",sans-serif'>The
+model became more resilient due to seeing more &quot;varied&quot; versions of
+the same data.</span></p>
+
+<p class=MsoNoSpacing style='line-height:200%'><span lang=EN-CA
+style='font-size:12.0pt;line-height:200%;font-family:"Aptos",sans-serif'>&nbsp;</span></p>
+
+<p class=MsoNoSpacing style='line-height:200%'><span lang=EN-CA
+style='font-size:12.0pt;line-height:200%;font-family:"Aptos",sans-serif'>&nbsp;</span></p>
+
+<p class=MsoNoSpacing style='line-height:200%'><span lang=EN-CA
+style='font-size:12.0pt;line-height:200%;font-family:"Aptos",sans-serif'>&nbsp;</span></p>
+
+<p class=MsoNoSpacing style='text-align:justify;line-height:200%'><b><span
+style='font-size:14.0pt;line-height:200%;font-family:"Aptos",sans-serif'>Model
+Architecture</span></b></p>
+
+<p class=MsoNoSpacing style='text-align:justify;line-height:200%'><span
+lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:"Aptos",sans-serif'>I
+kept the model straightforward but efficient because I was training on a CPU. </span></p>
+
+<p class=MsoNoSpacing style='margin-left:.5in;text-align:justify;text-indent:
+-.25in;line-height:200%'><span lang=EN-CA style='font-size:12.0pt;line-height:
+200%;font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-CA style='font-size:12.0pt;line-height:200%;
+font-family:"Aptos",sans-serif'>Three convolutional blocks with 32, 64, and 128
+filters each, followed by MaxPooling, comprised the CNN. </span></p>
+
+<p class=MsoNoSpacing style='margin-left:.5in;text-align:justify;text-indent:
+-.25in;line-height:200%'><span lang=EN-CA style='font-size:12.0pt;line-height:
+200%;font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-CA style='font-size:12.0pt;line-height:200%;
+font-family:"Aptos",sans-serif'>Flatten layer, then a Dense layer with 64 units
+</span></p>
+
+<p class=MsoNoSpacing style='margin-left:.5in;text-align:justify;text-indent:
+-.25in;line-height:200%'><span lang=EN-CA style='font-size:12.0pt;line-height:
+200%;font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-CA style='font-size:12.0pt;line-height:200%;
+font-family:"Aptos",sans-serif'>Use the sigmoid output layer and dropout (0.5)
+for binary classification to prevent overfitting. </span></p>
+
+<p class=MsoNoSpacing style='text-align:justify;line-height:200%'><span
+lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:"Aptos",sans-serif'>Just
+a simple, practical framework that was suitable for the job; nothing too
+elaborate.</span></p>
+
+<p class=MsoNoSpacing style='text-align:justify;line-height:200%'><span
+lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:"Aptos",sans-serif'>&nbsp;</span></p>
+
+<p class=MsoNoSpacing style='text-align:justify;line-height:200%'><b><span
+style='font-size:14.0pt;line-height:200%;font-family:"Aptos",sans-serif'>Training
+Procedure</span></b></p>
+
+<p class=MsoNoSpacing style='text-align:justify;line-height:200%'><span
+lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:"Aptos",sans-serif'>I
+used binary cross-entropy loss and the Adam optimizer to train the model over
+20 epochs. I saw the following throughout training:</span></p>
+
+<p class=MsoNoSpacing style='margin-left:.5in;text-align:justify;text-indent:
+-.25in;line-height:200%'><span lang=EN-CA style='font-size:12.0pt;line-height:
+200%;font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-CA style='font-size:12.0pt;line-height:200%;
+font-family:"Aptos",sans-serif'>Training accuracy increased significantly (to
+about 99%)</span></p>
+
+<p class=MsoNoSpacing style='margin-left:.5in;text-align:justify;text-indent:
+-.25in;line-height:200%'><span lang=EN-CA style='font-size:12.0pt;line-height:
+200%;font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-CA style='font-size:12.0pt;line-height:200%;
+font-family:"Aptos",sans-serif'>Validation accuracy leveled off at about 94.5%.
+</span></p>
+
+<p class=MsoNoSpacing style='text-align:justify;line-height:200%'><span
+lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:"Aptos",sans-serif'>The
+model trained reasonably well, albeit there was a slight discrepancy between
+the two—some modest overfitting. This was further supported when I produced the
+accuracy and loss graphs to show the learning curve.</span></p>
+
+<p class=MsoNoSpacing style='text-align:justify;line-height:200%'><span
+lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:"Aptos",sans-serif'>&nbsp;</span></p>
+
+<p class=MsoNoSpacing style='text-align:justify;line-height:200%'><b><span
+style='font-size:14.0pt;line-height:200%;font-family:"Aptos",sans-serif'>Evaluation</span></b></p>
+
+<p class=MsoNoSpacing style='text-align:justify;line-height:200%'><span
+lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:"Aptos",sans-serif'>I
+tested the model on the validation set to see how it works. Significant
+findings: </span></p>
+
+<p class=MsoNoSpacing style='margin-left:.5in;text-indent:-.25in;line-height:
+200%'><span lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:
+Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-CA style='font-size:12.0pt;line-height:200%;
+font-family:"Aptos",sans-serif'>94.5% is the validation accuracy. </span></p>
+
+<p class=MsoNoSpacing style='margin-left:.5in;text-indent:-.25in;line-height:
+200%'><span lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:
+Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-CA style='font-size:12.0pt;line-height:200%;
+font-family:"Aptos",sans-serif'>Loss of Validation: Remains reasonable</span></p>
+
+<p class=MsoNoSpacing style='text-align:justify;line-height:200%'><span
+lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:"Aptos",sans-serif'>A
+classification report or confusion matrix, which I want to include eventually,
+would highlight the precise areas where the model falters. However, the
+accuracy tells a good narrative even without that.</span></p>
+
+<p class=MsoNoSpacing style='text-align:justify;line-height:200%'><span
+lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:"Aptos",sans-serif'>&nbsp;</span></p>
+
+<p class=MsoNoSpacing style='text-align:justify;line-height:200%'><b><span
+style='font-size:14.0pt;line-height:200%;font-family:"Aptos",sans-serif'>Discussion</span></b></p>
+
+<p class=MsoNoSpacing style='text-align:justify;line-height:200%'><span
+lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:"Aptos",sans-serif'>Since
+I didn't use any pre-trained networks or GPUs, I must admit that I was
+pleasantly surprised by the model's performance. </span></p>
+
+<p class=MsoNoSpacing style='margin-left:.5in;text-align:justify;text-indent:
+-.25in;line-height:200%'><span lang=EN-CA style='font-size:12.0pt;line-height:
+200%;font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-CA style='font-size:12.0pt;line-height:200%;
+font-family:"Aptos",sans-serif'>Techniques like early stopping to prevent
+needless training and further regularization (such as adding L2 penalties)
+should help lessen the modest overfitting I noticed. </span></p>
+
+<p class=MsoNoSpacing style='margin-left:.5in;text-align:justify;text-indent:
+-.25in;line-height:200%'><span lang=EN-CA style='font-size:12.0pt;line-height:
+200%;font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-CA style='font-size:12.0pt;line-height:200%;
+font-family:"Aptos",sans-serif'>Transfer learning: Using pre-trained models
+such as MobileNet may significantly improve. </span></p>
+
+<p class=MsoNoSpacing style='text-align:justify;line-height:200%'><span
+lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:"Aptos",sans-serif'>&nbsp;</span></p>
+
+<p class=MsoNoSpacing style='text-align:justify;line-height:200%'><span
+lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:"Aptos",sans-serif'>&nbsp;</span></p>
+
+<p class=MsoNoSpacing style='text-align:justify;line-height:200%'><b><span
+style='font-size:14.0pt;line-height:200%;font-family:"Aptos",sans-serif'>Conclusion</span></b></p>
+
+<p class=MsoNoSpacing style='text-align:justify;line-height:200%'><span
+lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:"Aptos",sans-serif'>Our
+effort demonstrates that deep learning may be used to develop a practical
+solution for a critical problem like diagnosing malaria, even with low
+resources. I learned much about model design, data processing, and evaluation
+from the CNN I constructed, which achieved high accuracy. This might be a first
+step toward more intelligent healthcare solutions with a few more advancements
+in the future.</span></p>
+
+<p class=MsoNoSpacing style='text-align:justify;line-height:200%'><span
+lang=EN-CA style='font-size:12.0pt;line-height:200%;font-family:"Aptos",sans-serif'>&nbsp;</span></p>
+
+</div>
+
+</body>
+
+</html>
